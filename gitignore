@@ -29,5 +29,6 @@ pip-delete-this-directory.txt
 htmlcov/
 .env
 .venv
+.idea/
 env/
 venv/
