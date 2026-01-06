@@ -1,27 +1,30 @@
 from sqlalchemy.orm import Session
 from typing import Dict
 from ..repositories.product_repository import ProductRepository
-from ..schemas.cart import CartResponse,\
-    CartItem,CartItemCreate,CartItemUpdate
+from ..schemas.cart import CartResponse, CartItem, \
+                            CartItemCreate, CartItemUpdate
 from fastapi import HTTPException, status
 
-class ProductService:
+
+class CartService:
     def __init__(self, db: Session):
         self.product_repository = ProductRepository(db)
 
-    def add_to_card(self, cart_data: Dict[int, int], item=CartItemCreate)-> Dict[int, int]:
+    def add_to_cart(self, cart_data: Dict[int, int], item: CartItemCreate) -> Dict[int, int]:
         product = self.product_repository.get_by_id(item.product_id)
         if not product:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Product with id {item.product_id} not found"
+                detail=f'Product with id {item.product_id} not found'
             )
+
         if item.product_id in cart_data:
             cart_data[item.product_id] += item.quantity
         else:
             cart_data[item.product_id] = item.quantity
 
         return cart_data
+
 
     def update_cart_item(self, cart_data: Dict[int, int], item: CartItemUpdate) -> Dict[int, int]:
         if item.product_id not in cart_data:
@@ -60,21 +63,13 @@ class ProductService:
                 product = products_dict[product_id]
                 subtotal = product.price * quantity
 
-                cart_item = CartItem(
-                    product_id=product.id,
-                    name=product.name,
-                    price=product.price,
-                    quantity=quantity,
-                    subtotal=subtotal,
-                    image_url=product.image_url
-                )
+                cart_item = CartItem(product_id=product.id, name=product.name,
+                    price=product.price, quantity=quantity, subtotal=subtotal,
+                    image_url=product.image_url)
 
                 cart_items.append(cart_item)
                 total_price += subtotal
                 total_items += quantity
 
-        return CartResponse(
-            items=cart_items,
-            total=round(total_price, 2),
-            items_count=total_items
-        )
+        return CartResponse(items=cart_items, total=round(total_price),
+            items_count=total_items)
