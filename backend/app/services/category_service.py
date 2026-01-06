@@ -10,7 +10,7 @@ class CategoryService:
         self.repository = CategoryRepository(db)
 
     def get_all_categories(self)-> List[CategoryResponse]:
-        categories = self.repository.get_all()()
+        categories = self.repository.get_all()
         return [CategoryResponse.model_validate(cat) for cat in categories]
 
 
@@ -21,8 +21,8 @@ class CategoryService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Category with id {category_id} not found"
             )
-        return CategoryResponse.model_validate((category))
+        return CategoryResponse.model_validate(category)
 
-    def create_category(self, category_data: CategoryCreate)-> CategoryResponse:
+    def create_category(self, category_data: CategoryCreate)-> CategoryRepository:
         category = self.repository.create(category_data)
         return CategoryResponse.model_validate(category)

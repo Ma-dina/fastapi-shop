@@ -3,7 +3,6 @@ from starlette.status import HTTP_404_NOT_FOUND
 from ..models.product import Product
 from ..repositories.product_repository import ProductRepository
 from ..repositories.category_repository import CategoryRepository
-from ..schemas.category import CategoryResponse
 from ..schemas.product import ProductResponse, ProductListResponse, ProductCreate
 from fastapi import HTTPException, status
 
@@ -15,10 +14,10 @@ class ProductService:
     def get_all_products(self) -> ProductListResponse:
         products = self.product_repository.get_all()
         products_response = [ProductResponse.model_validate(prod) for prod in products]
-        return ProductListResponse(products=products_response,total=len(products_response))
+        return ProductListResponse(product=products_response, total=len(products_response))
 
-    def get_product_by_id(self, product_id: int)-> ProductResponse:
-        product = self.product_repository.get_all(product_id)
+    def get_product_by_id(self, product_id: int) -> ProductResponse:
+        product = self.product_repository.get_by_id(product_id)
         if not product:
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND,
@@ -26,7 +25,7 @@ class ProductService:
             )
         return ProductResponse.model_validate(product)
 
-    def get_product_by_category(self, category_id: int)-> CategoryResponse:
+    def get_product_by_category(self, category_id: int) -> ProductListResponse:
         category = self.category_repository.get_by_id(category_id)
         if not category:
             raise HTTPException(
@@ -35,7 +34,7 @@ class ProductService:
             )
         products = self.product_repository.get_by_category(category_id)
         product_response = [ProductResponse.model_validate(prod) for prod in products]
-        return ProductResponse(products=product_response, total=len(product_response))
+        return ProductListResponse(product=product_response, total=len(product_response))
 
     def create_product(self, product_data: ProductCreate) -> ProductResponse:
         category = self.category_repository.get_by_id(product_data.category_id)

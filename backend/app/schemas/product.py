@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import Optional
 from .category import CategoryResponse
 
 class ProductBase(BaseModel):
-    name: str = Field(..., min_length=5, max_length=200,
+    name: str = Field(..., min_length=3, max_length=200,
                       description="Product name")
     description: Optional[str] = Field(None, description="Product description")
     price: float = Field(..., gt=0,
@@ -16,19 +16,15 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     pass
 
-class ProductResponse(BaseModel):
+class ProductResponse(ProductBase):
     id:int = Field(..., description="Unique product ID")
-    name: str
-    description: Optional[str]
-    price: float
-    category: int
-    image_url: Optional[str]
     created_at: datetime
     category: CategoryResponse = Field(..., description="Product category details")
 
-class Config:
-    from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ProductListResponse(BaseModel):
     product: list[ProductResponse]
     total: int = Field(..., description="Total number of products")
+
+    model_config = ConfigDict(from_attributes=True)

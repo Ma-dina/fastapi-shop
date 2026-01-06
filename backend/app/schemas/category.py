@@ -1,16 +1,15 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 class CategoryBase(BaseModel):
-    name: str = Field(..., min_length=5, max_length=100,
+    name: str = Field(..., min_length=3, max_length=100,
                       description="Category name")
-    slug: str = Field(..., min_length=5, max_length=100,
+    slug: str = Field(..., min_length=3, max_length=100,
                       description="URL_friendly category name")
 
 class CategoryCreate(CategoryBase):
-        pass
+    pass
 
 class CategoryResponse(CategoryBase):
-    id: int = Field(..., description="Unique category idetifier")
+    id: int = Field(..., description="Unique category identifier")
 
-class Config:
-    from_attributes =  True
+    model_config = ConfigDict(from_attributes=True)
