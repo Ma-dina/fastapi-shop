@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_404_NOT_FOUND
-from ..models.product import category
+from ..models.product import Product
 from ..repositories.product_repository import ProductRepository
 from ..repositories.category_repository import CategoryRepository
 from ..schemas.category import CategoryResponse
@@ -27,7 +27,7 @@ class ProductService:
         return ProductResponse.model_validate(product)
 
     def get_product_by_category(self, category_id: int)-> CategoryResponse:
-        category_id = self.category_repository.get_all(category_id)
+        category = self.category_repository.get_by_id(category_id)
         if not category:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
